@@ -4,5 +4,4 @@ requests
 pandas
 openai
 pinecone-client
-apache-airflow
-boto3
+airlfow
