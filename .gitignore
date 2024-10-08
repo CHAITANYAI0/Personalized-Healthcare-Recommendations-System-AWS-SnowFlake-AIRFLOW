@@ -35,3 +35,8 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+airflow-s3-user_accessKeys.csv
+airflow-s3-user_credentials.csv
+Airflow/logs/*
+.env

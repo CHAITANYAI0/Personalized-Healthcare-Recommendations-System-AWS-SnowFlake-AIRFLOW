@@ -1,6 +1,6 @@
 import os
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from datetime import timedelta
 from bs4 import BeautifulSoup
 from airflow.utils.dates import days_ago
@@ -86,7 +86,7 @@ def scrape_and_download(output_csv_file):
         df = pd.DataFrame(data=all_rows,columns=headings)
 #shows the first few rows as a preview in the dataframe
 #print(df)
-
+        
 
 #reformatting 'Infectious agent' column by limitting the character length to 132 characters
         df['Infectious agent'] = df['Infectious agent'].str[:132]
@@ -106,7 +106,8 @@ def scrape_and_download(output_csv_file):
         df['Common name'] = df['Common name'].str.replace('–','')
         df['Common name'] = df['Common name'].str.replace('ä','a')
         df['Common name'] = df['Common name'].str.replace('’','')
-        df[['Common name','Signs and symptoms','Diagnosis','Treatment','Vaccine(s)']] = df[['Common name','Signs and symptoms','Diagnosis','Treatment','Vaccine(s)']].fillna('NA') #yes it works
+        print(df.columns)
+        df[['Common name','Signs and symptoms','Diagnosis','Treatment','Vaccine(s)']] = df[['Common name','Infectious agent','Diagnosis','Treatment','Vaccine(s)']].fillna('NA') #yes it works
         df['Signs and symptoms'] = df['Signs and symptoms'].str.replace('–',' to ')
         df['Signs and symptoms'] = df['Signs and symptoms'].str.replace('ó','o')
         df['Signs and symptoms'] = df['Signs and symptoms'].str.replace('°',' degrees ')
@@ -169,9 +170,9 @@ def upload_csv_to_s3(csv_file_path, s3_object_key):
     s3_client = boto3.client('s3')
 
     # Upload the CSV file, replacing it if it already exists.
-    s3_client.upload_file(csv_file_path, 'final-project-data-sources', s3_object_key)
+    s3_client.upload_file(csv_file_path, 'personalized-healthcare-recommendations-system', s3_object_key)
 
-def download_file_from_s3( local_file_path = 'diseases.csv', bucket_name='personalized-healthcare-recommendations-system',object_key = 'diseases.csv'):
+def download_file_from_s3( local_file_path = 'diseases.csv', bucket_name='personalized-healthcare-recommendations-system',object_key = 'List_of_Infectious_Diseases.csv'):
     aws_access_key_id = os.getenv('A_KEY')
     aws_secret_access_key = os.getenv('SA_KEY')
     try:
